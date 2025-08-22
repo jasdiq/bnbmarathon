@@ -16,29 +16,35 @@ In this lab, you'll focus on critical deployment aspects:
 ```
 accelerate-ai-lab3-starter/
 ├── README.md                    # This file
-├── pyproject.toml               # Python dependencies (complete)
-├── env.template                 # Environment template (complete)
-├── server.py                    # FastAPI server (TODO: implement)
-├── Dockerfile                   # Container config (TODO: implement)
-├── load_test.py                 # Load testing (TODO: implement)
-├── production_agent/            # Agent implementation
-│   ├── __init__.py             # Package init (complete)
-│   └── agent.py                # Agent logic (TODO: implement)
-└── ollama-backend/             # Ollama backend
-    └── Dockerfile              # Backend container (TODO: implement)
+├── ollama-backend/              # Ollama backend (separate deployment)
+│   └── Dockerfile               # Backend container (TODO: implement)
+└── adk-agent/                   # ADK agent (separate deployment)
+    ├── pyproject.toml           # Python dependencies (complete)
+    ├── env.template             # Environment template (complete)
+    ├── server.py                # FastAPI server (TODO: implement)
+    ├── Dockerfile               # Container config (TODO: implement)
+    ├── load_test.py             # Load testing (TODO: implement)
+    └── production_agent/        # Agent implementation
+        ├── __init__.py         # Package init (complete)
+        └── agent.py            # Agent logic (TODO: implement)
 ```
 
 ## 🎯 Files to Complete
 
 You'll need to implement the following files by following the codelab instructions:
 
-- ✅ `pyproject.toml` - Dependencies (already complete)
-- ✅ `env.template` - Environment template (already complete)
-- 🚧 `production_agent/agent.py` - ADK agent implementation
-- 🚧 `server.py` - FastAPI server with endpoints
-- 🚧 `Dockerfile` - Container configuration
-- 🚧 `load_test.py` - Load testing script
+**Ollama Backend:**
+
 - 🚧 `ollama-backend/Dockerfile` - Ollama container
+
+**ADK Agent:**
+
+- ✅ `adk-agent/pyproject.toml` - Dependencies (already complete)
+- ✅ `adk-agent/env.template` - Environment template (already complete)
+- 🚧 `adk-agent/production_agent/agent.py` - ADK agent implementation
+- 🚧 `adk-agent/server.py` - FastAPI server with endpoints
+- 🚧 `adk-agent/Dockerfile` - Container configuration
+- 🚧 `adk-agent/load_test.py` - Load testing script
 
 ## 📚 Getting Started
 
