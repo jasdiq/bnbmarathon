@@ -13,7 +13,7 @@ app_args = {"agents_dir": AGENT_DIR, "web": True}
 app: FastAPI = get_fast_api_app(**app_args)
 
 # Update app metadata
-app.title = "Production ADK Agent - Lab 3"
+app.title = "Production ADK Agent PriceGenie AI- Lab 3"
 app.description = "Gemma agent with GPU-accelerated backend"
 app.version = "1.0.0"
 

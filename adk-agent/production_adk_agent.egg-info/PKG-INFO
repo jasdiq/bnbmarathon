@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: production-adk-agent
+Version: 0.1.0
+Summary: Production-ready ADK agent for Lab 3 - Prototype to Production
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: google-adk==1.12.0
+Requires-Dist: python-dotenv==1.1.0
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: google-auth>=2.23.0
+Requires-Dist: locust==2.37.10
+Requires-Dist: litellm==1.77.0

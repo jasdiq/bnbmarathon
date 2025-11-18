@@ -2,8 +2,8 @@
 -- Creates features for the time-series model.
 
 CREATE OR REPLACE TABLE `training_data`
-PARTITION BY
-  price_date_partition -- Partition by month for performance
+PARTITION BY price_date_partition -- Partition by month for performance. The column must be a top-level column.
+OPTIONS(partition_expiration_days=1080) -- Optional: set a lifecycle policy
 CLUSTER BY
   district, market, commodity -- Cluster by frequently filtered columns
 AS

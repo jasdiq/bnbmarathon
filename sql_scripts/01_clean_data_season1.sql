@@ -4,20 +4,20 @@
 CREATE OR REPLACE TABLE `data_season1_cleaned` AS
 SELECT
     -- Standardize column names and cast to appropriate data types
-    CAST(year AS INT64) AS year,
+    SAFE_CAST(year AS INT64) AS year,
     location,
-    CAST(area AS FLOAT64) AS area,
-    CAST(rainfall AS FLOAT64) AS rainfall,
-    CAST(temperature AS FLOAT64) AS temperature,
+    SAFE_CAST(area AS FLOAT64) AS area,
+    SAFE_CAST(rainfall AS FLOAT64) AS rainfall,
+    SAFE_CAST(temperature AS FLOAT64) AS temperature,
     soiltype,
     irrigation,
-    CAST(yield AS FLOAT64) AS yield,
-    CAST(humidity AS FLOAT64) AS humidity,
+    SAFE_CAST(yeilds AS FLOAT64) AS yield, -- Corrected column name from 'yield' to 'yeilds'
+    SAFE_CAST(humidity AS FLOAT64) AS humidity,
     LOWER(crops) AS commodity, -- Standardize to lowercase
-    CAST(price AS FLOAT64) AS price,
+    SAFE_CAST(price AS FLOAT64) AS price,
     season
 FROM
-    `data_season1`;
+    `bcb-blr-abu.agri_dataset.data_season`;
 
 -- Best Practice: Data Quality Check
 -- After running this, you should check for NULLs or unexpected values.

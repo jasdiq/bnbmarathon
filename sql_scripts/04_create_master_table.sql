@@ -31,7 +31,7 @@ FROM
 LEFT JOIN
     `data_season1_cleaned` s
 ON
-    p.district = s.location -- Assuming location in data_season1 is the district
+    TRIM(LOWER(p.district)) = TRIM(LOWER(s.location)) -- Standardize join keys
     AND EXTRACT(YEAR FROM p.price_date) = s.year
     AND p.commodity = s.commodity;
 

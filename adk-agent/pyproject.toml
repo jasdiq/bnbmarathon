@@ -3,14 +3,17 @@ name = "production-adk-agent"
 version = "0.1.0"
 description = "Production-ready ADK agent for Lab 3 - Prototype to Production"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = "~=3.13.0"
 dependencies = [
     "google-adk==1.12.0",
     "python-dotenv==1.1.0",
     "httpx>=0.25.0",
-    "google-auth>=2.23.0",
-    "locust==2.37.10",
-    "litellm==1.77.0",
+    "google-auth>=0.23.0",
+    "locust>=2.27.0",
+    "litellm==1.79.1",
+    "google-cloud-bigquery",
+    "pandas",
+    "google-generativeai"
 ]
 
 [dependency-groups]

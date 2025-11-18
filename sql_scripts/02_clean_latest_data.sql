@@ -10,15 +10,14 @@ SELECT
     LOWER(commodity) AS commodity, -- Standardize to lowercase
     variety,
     grade,
-    -- Parse the date, assuming 'DD/MM/YYYY' format. Adjust if needed.
-    PARSE_DATE('%d/%m/%Y', arrival_date) AS price_date,
-    CAST(mix_price AS FLOAT64) AS min_price, -- Assuming mix_price is min_price
-    CAST(max_price AS FLOAT64) AS max_price,
-    CAST(modalprice AS FLOAT64) AS modal_price
+    Arrival_Date AS price_date, -- The column is already a DATE type
+    SAFE_CAST(`Min_x0020_Price` AS FLOAT64) AS min_price, -- Corrected column name and used SAFE_CAST
+    SAFE_CAST(`Max_x0020_Price` AS FLOAT64) AS max_price, -- Corrected column name and used SAFE_CAST
+    SAFE_CAST(`Modal_x0020_Price` AS FLOAT64) AS modal_price -- Corrected column name and used SAFE_CAST
 FROM
-    `latest_data`;
+    `bcb-blr-abu.agri_dataset.agri_latest_data`;
 
 -- Best Practice: Handle Parsing Errors
--- Check for dates that failed to parse.
--- SELECT arrival_date FROM `latest_data`
--- WHERE PARSE_DATE('%d/%m/%Y', arrival_date) IS NULL;
+-- Check for values that failed to cast.
+-- SELECT * FROM `bcb-blr-abu.agri_dataset.agri_latest_data`
+-- WHERE `Min_x0020_Price` IS NOT NULL AND SAFE_CAST(`Min_x0020_Price` AS FLOAT64) IS NULL;
