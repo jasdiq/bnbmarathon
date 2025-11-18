@@ -1,8 +1,8 @@
-AI Price Prediction Pipeline
+# AI Price Prediction Pipeline
 This directory contains the scripts to build a complete AI price prediction pipeline using BigQuery ML.
 
-Pipeline Steps
-Data Cleaning and Standardization:
+# Pipeline Steps
+## Data Cleaning and Standardization:
 
 01_clean_data_season1.sql: Cleans historical farming data.
 02_clean_latest_data.sql: Cleans latest daily prices.
@@ -43,3 +43,27 @@ Evaluation: Use ML.EVALUATE to assess your model's performance on the test set. 
 Hyperparameter Tuning: The ARIMA_PLUS model has hyperparameters you can tune. You can manually try different values or use BigQuery ML's automatic hyperparameter tuning.
 Running the Scripts
 You can run these SQL scripts directly in the BigQuery console or use a tool like bq command-line tool to execute them. Make sure to run them in the numbered order.
+
+# file structure
+
+1 /home/siddiqh77/accelerate-ai-lab3-starter/adk-agent/
+    2 ├── cloudbuild.yaml
+    3 ├── Dockerfile
+    4 ├── elasticity_test.py
+    5 ├── pyproject.toml
+    6 ├── server.py
+    7 ├── test_gemini.py
+    8 ├── uv.lock
+    9 ├── production_adk_agent.egg-info/
+   10 │   ├── dependency_links.txt
+   11 │   ├── PKG-INFO
+   12 │   ├── requires.txt
+   13 │   ├── SOURCES.txt
+   14 │   └── top_level.txt
+   15 ├── production_agent/
+   16 │   ├── agent.py
+   17 │   └── __init__.py
+   18 └── __pycache__/
+   19     ├── elasticity_test.cpython-313.pyc
+   20     └── server.cpython-313.pyc
+
