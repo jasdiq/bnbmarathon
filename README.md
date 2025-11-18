@@ -1,62 +1,45 @@
-# Lab 3: Prototype to Production - Starter Files
+AI Price Prediction Pipeline
+This directory contains the scripts to build a complete AI price prediction pipeline using BigQuery ML.
 
-Welcome to Lab 3! This is the starter repository where you'll build a production-ready ADK agent step by step.
+Pipeline Steps
+Data Cleaning and Standardization:
 
-## 🚀 What You'll Build
+01_clean_data_season1.sql: Cleans historical farming data.
+02_clean_latest_data.sql: Cleans latest daily prices.
+03_clean_agg_data.sql: Cleans aggregated price data.
+Create Master Table:
 
-In this lab, you'll focus on critical deployment aspects:
+04_create_master_table.sql: Joins the three sources into a single table.
+Feature Engineering:
 
-1. **Deploy Gemma to Cloud Run with GPU** - Set up a high-performance Gemma model backend
-2. **Integrate the Gemma deployment with an ADK agent** - Connect your agent to the GPU-accelerated model
-3. **Test with ADK Web interface** - Validate your conversational agent works correctly
-4. **Perform load testing** - Observe how both Cloud Run instances auto-scale under load
+05_feature_engineering.sql: Creates lag features, moving averages, and seasonality flags.
+Model Training:
 
-## 📁 Starter Structure
+06_train_model.sql: Trains a time-series model using BigQuery ML (ARIMA_PLUS).
+Prediction:
 
-```
-accelerate-ai-lab3-starter/
-├── README.md                    # This file
-├── ollama-backend/              # Ollama backend (separate deployment)
-│   └── Dockerfile               # Backend container (TODO: implement)
-└── adk-agent/                   # ADK agent (separate deployment)
-    ├── pyproject.toml           # Python dependencies (complete)
-    ├── env.template             # Environment template (complete)
-    ├── server.py                # FastAPI server (TODO: implement)
-    ├── Dockerfile               # Container config (TODO: implement)
-    ├── elasticity_test.py       # Elasticity testing (TODO: implement)
-    └── production_agent/        # Agent implementation
-        ├── __init__.py          # Package init (complete)
-        └── agent.py             # Agent logic (TODO: implement)
-```
+07_predict.sql: Generates predictions and a "Sell/Wait" recommendation.
+Optional Python Preprocessing:
 
-## 🎯 Files to Complete
-
-You'll need to implement the following files by following the codelab instructions:
-
-**Ollama Backend:**
-
-- 🚧 `ollama-backend/Dockerfile` - Ollama container
-
-**ADK Agent:**
-
-- ✅ `adk-agent/pyproject.toml` - Dependencies (already complete)
-- ✅ `adk-agent/env.template` - Environment template (already complete)
-- 🚧 `adk-agent/production_agent/agent.py` - ADK agent implementation
-- 🚧 `adk-agent/server.py` - FastAPI server with endpoints
-- 🚧 `adk-agent/Dockerfile` - Container configuration
-- 🚧 `adk-agent/elasticity_test.py` - Elasticity testing script
-
-## 📚 Getting Started
-
-1. Follow the codelab instructions to implement each TODO section
-2. Copy and paste the provided code snippets
-3. Deploy Gemma backend to Cloud Run with GPU
-4. Deploy ADK agent and test with elasticity testing
-
-## 🔗 Resources
-
-- [Complete Solution](https://github.com/amitkmaraj/accelerate-ai-lab3-complete)
-- [Google ADK Documentation](https://cloud.google.com/agent-development-kit)
-- [Cloud Run Documentation](https://cloud.google.com/run/docs)
-
-Happy coding! 🎉
+preprocessing_notebook.py: A Python script for preprocessing in a Vertex AI Notebook.
+Best Practices and Recommendations
+Data Quality and Missing Values
+Check for NULLs: After each cleaning and join step, check for NULL values in important columns.
+Handle Date Parsing Errors: When parsing dates, always check for rows that failed to parse.
+Imputation Strategy: You will have missing values, especially for the seasonal features in recent data. The master_table script uses a LEFT JOIN, which will result in NULLs. You need a strategy to fill these.
+Simple: Fill with the mean of the last known season.
+Better: Use forward fill (FFILL) to carry the last known value forward.
+Advanced: Use a more sophisticated imputation model. The optional Python script shows a simple mean-based imputation.
+Joining Logic
+The current logic joins seasonal data based on the year. This is a reasonable simplification. For a more granular model, you could try to interpolate seasonal data across the year.
+Ensure that the join keys (district, market, commodity) are clean and consistent across all tables. The cleaning scripts standardize commodity to lowercase, which helps. You should do a similar check for district and market names.
+Partitioning and Clustering
+The training_data table is partitioned by month (price_date_partition) and clustered by district, market, and commodity.
+Partitioning is crucial for time-series data. It prunes the data scanned in queries that have a date filter, which saves costs and improves performance.
+Clustering co-locates data within a partition. Since you will be running queries that group by district, market, and commodity (e.g., for window functions or training), clustering on these columns will significantly improve performance.
+Model Training and Evaluation
+Train/Test Split: Always split your data into training and testing sets. The training script uses a simple date-based split. You can also use the DATA_SPLIT_METHOD option in CREATE MODEL.
+Evaluation: Use ML.EVALUATE to assess your model's performance on the test set. For time-series models, look at metrics like mean_absolute_percentage_error.
+Hyperparameter Tuning: The ARIMA_PLUS model has hyperparameters you can tune. You can manually try different values or use BigQuery ML's automatic hyperparameter tuning.
+Running the Scripts
+You can run these SQL scripts directly in the BigQuery console or use a tool like bq command-line tool to execute them. Make sure to run them in the numbered order.
