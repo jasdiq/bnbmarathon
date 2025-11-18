@@ -1,53 +1,153 @@
-# AI Price Prediction Pipeline
+# 🌾 PriceGenie AI – Agricultural Price Prediction & Decision Support  
+AI-driven price forecasting using BigQuery ML, Cloud Run, and the Google ADK Agent
 
-This directory contains the scripts to build a complete AI price prediction pipeline using BigQuery ML.
+PriceGenie AI is an end-to-end agricultural market intelligence system that predicts commodity prices and provides actionable recommendations such as **Sell** or **Wait** for farmers, traders, grocery owners, and local markets.
 
-## Pipeline Steps
+This project uses **BigQuery ML (ARIMA+ Model)**, **SQL-based ETL pipelines**, **Python preprocessing**, and a **Cloud Run–deployed ADK Agent** to deliver real-time price insights.
 
-1.  **Data Cleaning and Standardization**:
-    *   `01_clean_data_season1.sql`: Cleans historical farming data.
-    *   `02_clean_latest_data.sql`: Cleans latest daily prices.
-    *   `03_clean_agg_data.sql`: Cleans aggregated price data.
+## 🚀 Key Features
 
-2.  **Create Master Table**:
-    *   `04_create_master_table.sql`: Joins the three sources into a single table.
+### ✔️ AI Price Forecasting
+Predicts future commodity prices using BigQuery’s ARIMA_PLUS time-series modeling.
 
-3.  **Feature Engineering**:
-    *   `05_feature_engineering.sql`: Creates lag features, moving averages, and seasonality flags.
+### ✔️ Sell / Wait Recommendation Engine
+Generates actionable recommendations based on predicted price movements.
 
-4.  **Model Training**:
-    *   `06_train_model.sql`: Trains a time-series model using BigQuery ML (`ARIMA_PLUS`).
+### ✔️ Fully Automated Pipeline
+- Cleans raw agricultural datasets  
+- Builds master tables  
+- Engineers time-series features  
+- Trains models  
+- Generates predictions  
 
-5.  **Prediction**:
-    *   `07_predict.sql`: Generates predictions and a "Sell/Wait" recommendation.
+### ✔️ ADK Agent Deployment
+A conversational agent serves predictions via a FastAPI backend running on Cloud Run.
 
-6.  **Optional Python Preprocessing**:
-    *   `preprocessing_notebook.py`: A Python script for preprocessing in a Vertex AI Notebook.
+### ✔️ Scalable Cloud Architecture
+- BigQuery storage & ML  
+- ADK agent on Cloud Run  
+- Load testing using autoscaling tests  
+- Containerized builds with Cloud Build  
 
-## Best Practices and Recommendations
+---
 
-### Data Quality and Missing Values
-*   **Check for NULLs**: After each cleaning and join step, check for `NULL` values in important columns.
-*   **Handle Date Parsing Errors**: When parsing dates, always check for rows that failed to parse.
-*   **Imputation Strategy**: You will have missing values, especially for the seasonal features in recent data. The `master_table` script uses a `LEFT JOIN`, which will result in `NULL`s. You need a strategy to fill these.
-    *   **Simple**: Fill with the mean of the last known season.
-    *   **Better**: Use forward fill (`FFILL`) to carry the last known value forward.
-    *   **Advanced**: Use a more sophisticated imputation model.
-    The optional Python script shows a simple mean-based imputation.
+# 📁 Project Structure
 
-### Joining Logic
-*   The current logic joins seasonal data based on the year. This is a reasonable simplification. For a more granular model, you could try to interpolate seasonal data across the year.
-*   Ensure that the join keys (district, market, commodity) are clean and consistent across all tables. The cleaning scripts standardize commodity to lowercase, which helps. You should do a similar check for district and market names.
+```
+adk-agent/
+├── cloudbuild.yaml              # Cloud Build for deploying PriceGenie AI agent
+├── Dockerfile                   # Container for Cloud Run deployment
+├── elasticity_test.py           # Load test for autoscaling
+├── pyproject.toml               # Dependencies for ADK agent
+├── server.py                    # FastAPI server exposing prediction/chat endpoints
+├── test_gemini.py               # Model integration test
+├── production_adk_agent.egg-info/
+│   ├── PKG-INFO
+│   ├── requires.txt
+│   └── SOURCES.txt
+├── production_agent/
+│   ├── agent.py                 # Core ADK agent logic for PriceGenie AI
+│   └── __init__.py
+└── __pycache__/
+```
 
-### Partitioning and Clustering
-*   The `training_data` table is partitioned by month (`price_date_partition`) and clustered by `district`, `market`, and `commodity`.
-*   **Partitioning** is crucial for time-series data. It prunes the data scanned in queries that have a date filter, which saves costs and improves performance.
-*   **Clustering** co-locates data within a partition. Since you will be running queries that group by `district`, `market`, and `commodity` (e.g., for window functions or training), clustering on these columns will significantly improve performance.
+---
 
-### Model Training and Evaluation
-*   **Train/Test Split**: Always split your data into training and testing sets. The training script uses a simple date-based split. You can also use the `DATA_SPLIT_METHOD` option in `CREATE MODEL`.
-*   **Evaluation**: Use `ML.EVALUATE` to assess your model's performance on the test set. For time-series models, look at metrics like `mean_absolute_percentage_error`.
-*   **Hyperparameter Tuning**: The `ARIMA_PLUS` model has hyperparameters you can tune. You can manually try different values or use BigQuery ML's automatic hyperparameter tuning.
+# 🔄 AI Pipeline Overview
 
-### Running the Scripts
-You can run these SQL scripts directly in the BigQuery console or use a tool like `bq` command-line tool to execute them. Make sure to run them in the numbered order.
+PriceGenie AI follows a structured BigQuery ML pipeline built using SQL scripts:
+
+### 1. Data Cleaning
+- `01_clean_data_season1.sql`
+- `02_clean_latest_data.sql`
+- `03_clean_agg_data.sql`
+
+### 2. Master Table Creation
+- `04_create_master_table.sql`  
+
+### 3. Feature Engineering
+- `05_feature_engineering.sql`
+
+### 4. Model Training (BigQuery ML)
+- `06_train_model.sql`  
+
+### 5. Prediction + Recommendation
+- `07_predict.sql`
+
+### 6. Optional Python Preprocessing
+`preprocessing_notebook.py`
+
+---
+
+# 🧠 Best Practices Used in PriceGenie AI
+
+### ✔️ Data Quality Checks
+- NULL checks after joins  
+- Seasonal data validation  
+- Forward fill and mean-based imputation  
+
+### ✔️ BigQuery Optimizations
+- Partitioning on `price_date_partition`  
+- Clustering on `district`, `market`, `commodity`  
+
+### ✔️ ML Evaluation
+Metrics used:  
+- MAPE  
+- RMSE  
+
+---
+
+# ☁️ Cloud Run + ADK Agent Deployment
+
+### ADK Agent Responsibilities
+- Answer price questions  
+- Trigger model predictions  
+- Explain Sell/Wait recommendations  
+- Chat interface integration  
+
+### Deployment Steps
+1. Build using `cloudbuild.yaml`  
+2. Deploy container to Cloud Run  
+3. Expose FastAPI server (`server.py`)  
+4. Test with ADK Web interface  
+5. Run `elasticity_test.py` for autoscaling  
+
+---
+
+# 📊 End-to-End Flow Diagram (Text Version)
+
+```
+Raw Price Data
+      ↓
+SQL Cleaning Scripts
+      ↓
+Master Table
+      ↓
+Feature Engineering
+      ↓
+BigQuery ML (ARIMA+)
+      ↓
+Predictions Table
+      ↓
+ADK Agent via Cloud Run
+      ↓
+User gets: Price Prediction + Sell/Wait Recommendation
+```
+
+---
+
+# 📜 How This Aligns With the "PriceGenie AI" Project Goals
+
+This repository directly supports:  
+✔️ Agricultural price prediction  
+✔️ Market decision support (Sell/Wait engine)  
+✔️ BigQuery ML model pipeline  
+✔️ Cloud-based agent for end users  
+✔️ Complete ETL + ML + API architecture  
+✔️ Solving real-world farmer and grocery market problems  
+
+---
+
+# 📞 Contact / Notes
+Maintained by: **Abubakar Siddique**  
+Project: **PriceGenie AI – Agricultural Price Intelligence System**  
