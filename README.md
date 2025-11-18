@@ -1,69 +1,159 @@
-# AI Price Prediction Pipeline
-This directory contains the scripts to build a complete AI price prediction pipeline using BigQuery ML.
+# 🌾 AI Price Prediction Pipeline (BigQuery ML)
 
-# Pipeline Steps
-## Data Cleaning and Standardization:
+This project contains a complete **AI-powered agricultural price prediction pipeline** built using **BigQuery ML**, along with supporting scripts, cleaning workflows, and production-ready components deployed using an ADK agent.
 
-01_clean_data_season1.sql: Cleans historical farming data.
-02_clean_latest_data.sql: Cleans latest daily prices.
-03_clean_agg_data.sql: Cleans aggregated price data.
-Create Master Table:
+## 📌 Key Components
 
-04_create_master_table.sql: Joins the three sources into a single table.
-Feature Engineering:
+### ✔️ Data Cleaning  
+Scripts to standardize, normalize, and clean raw price datasets.
 
-05_feature_engineering.sql: Creates lag features, moving averages, and seasonality flags.
-Model Training:
+| Script | Purpose |
+|--------|---------|
+| `01_clean_data_season1.sql` | Cleans historical farming data |
+| `02_clean_latest_data.sql` | Cleans latest daily market prices |
+| `03_clean_agg_data.sql` | Cleans aggregated commodity-level pricing data |
 
-06_train_model.sql: Trains a time-series model using BigQuery ML (ARIMA_PLUS).
-Prediction:
+---
 
-07_predict.sql: Generates predictions and a "Sell/Wait" recommendation.
-Optional Python Preprocessing:
+### ✔️ Master Table Creation  
+| Script | Purpose |
+|--------|---------|
+| `04_create_master_table.sql` | Joins cleaned tables → creates a single unified training dataset |
 
-preprocessing_notebook.py: A Python script for preprocessing in a Vertex AI Notebook.
-Best Practices and Recommendations
-Data Quality and Missing Values
-Check for NULLs: After each cleaning and join step, check for NULL values in important columns.
-Handle Date Parsing Errors: When parsing dates, always check for rows that failed to parse.
-Imputation Strategy: You will have missing values, especially for the seasonal features in recent data. The master_table script uses a LEFT JOIN, which will result in NULLs. You need a strategy to fill these.
-Simple: Fill with the mean of the last known season.
-Better: Use forward fill (FFILL) to carry the last known value forward.
-Advanced: Use a more sophisticated imputation model. The optional Python script shows a simple mean-based imputation.
-Joining Logic
-The current logic joins seasonal data based on the year. This is a reasonable simplification. For a more granular model, you could try to interpolate seasonal data across the year.
-Ensure that the join keys (district, market, commodity) are clean and consistent across all tables. The cleaning scripts standardize commodity to lowercase, which helps. You should do a similar check for district and market names.
-Partitioning and Clustering
-The training_data table is partitioned by month (price_date_partition) and clustered by district, market, and commodity.
-Partitioning is crucial for time-series data. It prunes the data scanned in queries that have a date filter, which saves costs and improves performance.
-Clustering co-locates data within a partition. Since you will be running queries that group by district, market, and commodity (e.g., for window functions or training), clustering on these columns will significantly improve performance.
-Model Training and Evaluation
-Train/Test Split: Always split your data into training and testing sets. The training script uses a simple date-based split. You can also use the DATA_SPLIT_METHOD option in CREATE MODEL.
-Evaluation: Use ML.EVALUATE to assess your model's performance on the test set. For time-series models, look at metrics like mean_absolute_percentage_error.
-Hyperparameter Tuning: The ARIMA_PLUS model has hyperparameters you can tune. You can manually try different values or use BigQuery ML's automatic hyperparameter tuning.
-Running the Scripts
-You can run these SQL scripts directly in the BigQuery console or use a tool like bq command-line tool to execute them. Make sure to run them in the numbered order.
+---
 
-# file structure
+### ✔️ Feature Engineering  
+| Script | Purpose |
+|--------|---------|
+| `05_feature_engineering.sql` | Creates lag features, moving averages, seasonal flags, and trend features |
 
-1 /home/siddiqh77/accelerate-ai-lab3-starter/adk-agent/
-    2 ├── cloudbuild.yaml
-    3 ├── Dockerfile
-    4 ├── elasticity_test.py
-    5 ├── pyproject.toml
-    6 ├── server.py
-    7 ├── test_gemini.py
-    8 ├── uv.lock
-    9 ├── production_adk_agent.egg-info/
-   10 │   ├── dependency_links.txt
-   11 │   ├── PKG-INFO
-   12 │   ├── requires.txt
-   13 │   ├── SOURCES.txt
-   14 │   └── top_level.txt
-   15 ├── production_agent/
-   16 │   ├── agent.py
-   17 │   └── __init__.py
-   18 └── __pycache__/
-   19     ├── elasticity_test.cpython-313.pyc
-   20     └── server.cpython-313.pyc
+---
 
+### ✔️ Model Training (BigQuery ML)  
+| Script | Purpose |
+|--------|---------|
+| `06_train_model.sql` | Trains ARIMA_PLUS / time-series model using BigQuery ML |
+
+---
+
+### ✔️ Prediction  
+| Script | Purpose |
+|--------|---------|
+| `07_predict.sql` | Generates predictions + Sell/Wait recommendation |
+
+---
+
+### ✔️ Optional Preprocessing (Python)
+
+`preprocessing_notebook.py` – runs inside Vertex AI Notebook to preprocess, visualize, and fix missing values.
+
+---
+
+## 🧠 Best Practices & Recommendations
+
+### 🔍 1. Data Quality  
+- Always check for **NULLs after cleaning & joining**  
+- Validate date formats  
+- Standardize commodity, district, and market names  
+
+**Missing Value Strategy**  
+- Simple: Fill season gaps using historical mean  
+- Better: Forward fill (FFILL)  
+- Advanced: ML-based imputation
+
+---
+
+### 🔗 2. Joining Logic  
+- Ensure consistent keys across all tables  
+- Seasonal table joined by year (acceptable simplification)
+
+---
+
+### 🗂️ 3. Partitioning & Clustering  
+- Partition by: `price_date_partition`  
+- Cluster by: `district`, `market`, `commodity`  
+
+Benefits:  
+- Faster queries  
+- Lower BigQuery cost  
+- Better performance for window functions
+
+---
+
+### 🤖 4. Model Training & Evaluation  
+- Use date-based train/test split  
+- Evaluate with metrics like:  
+  - mean_absolute_percentage_error  
+  - root_mean_squared_error  
+- Tune ARIMA_PLUS hyperparameters
+
+---
+
+## ▶️ 5. Running the Pipeline  
+
+Run scripts in this order:
+
+```
+01_clean_data_season1.sql
+02_clean_latest_data.sql
+03_clean_agg_data.sql
+04_create_master_table.sql
+05_feature_engineering.sql
+06_train_model.sql
+07_predict.sql
+```
+
+Run via console or:
+
+```bash
+bq query --use_legacy_sql=false < script.sql
+```
+
+---
+
+# 📁 Project File Structure
+
+```
+adk-agent/
+├── cloudbuild.yaml
+├── Dockerfile
+├── elasticity_test.py
+├── pyproject.toml
+├── server.py
+├── test_gemini.py
+├── uv.lock
+├── production_adk_agent.egg-info/
+│   ├── dependency_links.txt
+│   ├── PKG-INFO
+│   ├── requires.txt
+│   ├── SOURCES.txt
+│   └── top_level.txt
+├── production_agent/
+│   ├── agent.py
+│   └── __init__.py
+└── __pycache__/
+```
+
+---
+
+# 🚀 End-to-End Flow
+
+1. Clean raw farming data  
+2. Build master dataset  
+3. Engineer features  
+4. Train ARIMA+ model  
+5. Predict prices  
+6. Recommend “Sell / Wait”  
+7. Deploy ADK agent  
+8. Run load tests on Cloud Run  
+
+---
+
+# 📦 Deployment Notes
+
+### Cloud Run  
+- Containerized via Dockerfile  
+- Auto-scaling tested using elasticity_test.py
+
+### Cloud Build  
+- Build & push using cloudbuild.yaml
